@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Epilogue: 1994년 5월 1일</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+    <style>
+        /* [공통 설정] */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Pretendard Variable", Pretendard, sans-serif;
+            width: 100vw; height: 100vh;
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* --- [배경 레이어] --- */
+        .bg-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+        }
+        
+        /* Scene 1 배경 */
+        #bg-scene1 {
+            position: absolute; inset: 0;
+            background: url('dead.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.4);
+            transform: scale(1.1);
+            transition: opacity 1.5s ease, transform 10s ease-out;
+            opacity: 1; 
+        }
+        
+        /* Scene 2 배경 */
+        #bg-scene2 {
+            position: absolute; inset: 0;
+            background: url('funeral.png') no-repeat center center;
+            background-size: cover;
+            opacity: 0; 
+            transition: opacity 1.5s ease;
+        }
+        .funeral-overlay {
+            position: absolute; inset: 0; background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Scene 3 배경 */
+        #bg-scene3 {
+            position: absolute; inset: 0;
+            background: url('senna_win.png') no-repeat top center;
+            background-size: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        .win-overlay {
+            position: absolute; inset: 0; background-color: rgba(0, 0, 0, 0.6); 
+        }
+
+        /* Scene 4 배경 (완전 검정) */
+        #bg-scene4 {
+            position: absolute; inset: 0;
+            background-color: #000;
+            opacity: 0; transition: opacity 2.0s ease;
+        }
+
+        body.loaded #bg-scene1 { transform: scale(1); }
+
+        /* --- [헤더] --- */
+        header {
+            position: fixed; top: 0; width: 100%;
+            padding: 18px 0;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            font-size: 18px; font-weight: 500;
+            z-index: 9999;
+            transition: opacity 0.5s;
+            opacity: 0; 
+        }
+
+        /* --- [메인 콘텐츠] --- */
+        .content-wrapper {
+            position: relative;
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Scene 1 스타일 */
+        #scene1 {
+            position: absolute; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            transition: opacity 1.0s ease; opacity: 1; z-index: 10;
+        }
+        .text-container { max-width: 800px; text-align: center; padding: 0 30px; word-break: keep-all; }
+        .text-line {
+            display: block; font-size: 24px; font-weight: 400; line-height: 1.8;
+            opacity: 0; transform: translateY(30px); margin-bottom: 30px;
+            transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        @media (max-width: 768px) { .text-line { font-size: 18px; } }
+
+        /* Scene 2 스타일 */
+        #scene2 {
+            position: absolute; width: 90%; max-width: 1600px; height: 80%;
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 50px;
+            opacity: 0; pointer-events: none; transition: opacity 1.5s ease; z-index: 10;
+        }
+        #scene2.active { opacity: 1; pointer-events: all; }
+
+        .left-panel { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+        .photo-frame { margin-bottom: 40px; width: fit-content; }
+        .photo-frame img { width: 550px; height: auto; display: block; }
+        
+        .desc-group { display: flex; align-items: flex-start; gap: 20px; max-width: 600px; }
+        .arrow-img { width: 100px; transform: rotate(10deg); }
+        .desc-text { font-size: 17px; line-height: 1.5; font-weight: 500; text-shadow: 0 2px 10px rgba(0,0,0,0.8); margin-top: 60px; }
+
+        .right-panel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .section-title { font-size: 32px; font-weight: 700; margin-bottom: 50px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px; }
+        
+        .letters-container {
+            display: flex; gap: 30px; justify-content: center; margin-bottom: 50px;
+            align-items: flex-end; height: 280px;
+        }
+        .letter-item { width: 180px; cursor: pointer; transition: transform 0.3s ease; }
+        .letter-item:hover { transform: scale(1.05) translateY(-10px); }
+        .letter-item img { width: 100%; drop-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
+        .final-mystery-text {
+            opacity: 0; transform: translateY(20px); transition: opacity 1.5s ease, transform 1.5s ease;
+            font-size: 20px; line-height: 1.8; background: rgba(255, 255, 255, 0.8); padding: 30px;
+            max-width: 800px; text-align: left; color: #222; 
+        }
+        .final-mystery-text.show { opacity: 1; transform: translateY(0); }
+
+        /* Scene 3 스타일 */
+        #scene3 {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 1.5s ease; z-index: 10;
+        }
+        #scene3.active { opacity: 1; pointer-events: all; }
+
+        .intro-text-s3 {
+            position: absolute; top: 15%; 
+            font-size: 28px; font-weight: 600; text-align: center;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            opacity: 0; transform: translateY(-20px); transition: opacity 1s ease, transform 1s ease;
+            width: 100%;
+        }
+
+        .polaroid-container { position: relative; width: 100%; height: 100%; max-width: 1400px; }
+        
+        .polaroid-img {
+            position: absolute; width: 360px; height: auto;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            opacity: 0; transform: scale(0.9) translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #p1 { top: 25%; left: 5%; transform: rotate(-5deg) scale(0.9) translateY(30px); }
+        #p1.show { transform: rotate(-5deg) scale(1) translateY(0); opacity: 1; }
+
+        #p2 { top: 55%; left: 20%; width: 420px; transform: rotate(3deg) scale(0.9) translateY(30px); }
+        #p2.show { transform: rotate(10deg) scale(1) translateY(0); opacity: 1; }
+
+        #p3 { top: 30%; right: 25%; width: 380px; transform: rotate(2deg) scale(0.9) translateY(30px); }
+        #p3.show { transform: rotate(-8deg) scale(1) translateY(0); opacity: 1; }
+
+        #p4 { top: 20%; right: 2%; transform: rotate(-4deg) scale(0.9) translateY(30px); }
+        #p4.show { transform: rotate(13deg) scale(1) translateY(0); opacity: 1; }
+
+        /* ================= [추가] SCENE 4 스타일 (엔딩) ================= */
+        #scene4 {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 2.0s ease; z-index: 20;
+            text-align: center;
+        }
+        #scene4.active { opacity: 1; pointer-events: all; }
+
+        .legacy-text {
+            max-width: 800px; font-size: 20px; line-height: 1.8; font-weight: 300;
+            color: #ccc; margin-bottom: 50px; opacity: 0; transform: translateY(20px);
+            transition: all 1.5s ease;
+        }
+        .legacy-text strong { color: #fff; font-weight: 600; }
+        .legacy-text.show { opacity: 1; transform: translateY(0); }
+
+        /* 추모 섹션 */
+        .tribute-container {
+            display: flex; flex-direction: column; align-items: center;
+            margin-bottom: 50px; opacity: 0; transform: translateY(30px);
+            transition: all 1.5s ease;
+        }
+        .tribute-container.show { opacity: 1; transform: translateY(0); }
+
+        .tribute-img {
+            width: 180px; height: auto; border-radius: 50%;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.2); /* 금빛 후광 */
+            margin-bottom: 20px;
+        }
+        .tribute-info h1 {
+            font-size: 36px; font-weight: 700; color: #F2C500; /* 세나 옐로우 */
+            margin-bottom: 10px; letter-spacing: 1px;
+        }
+        .tribute-info .dates {
+            font-size: 16px; color: #888; margin-bottom: 15px; letter-spacing: 2px;
+        }
+        .tribute-info .honor {
+            font-size: 20px; font-weight: 400; color: #fff;
+        }
+
+        /* 하단 그룹 (배지 + 버튼) */
+        .footer-group {
+            opacity: 0; transition: opacity 1.5s ease; display: flex; flex-direction: column; align-items: center; gap: 30px;
+        }
+        .footer-group.show { opacity: 1; }
+
+        .end-badge {
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 24px; font-size: 14px; letter-spacing: 4px; color: #666;
+        }
+
+        /* 처음으로 버튼 */
+        .restart-btn {
+            background: transparent; border: 0.5px solid #fff; color: #fff;
+            padding: 12px 30px; font-size: 16px; font-weight: 500; cursor: pointer;
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .restart-btn:hover { background: #fff; color: #000; transform: scale(1.05); }
+
+
+        /* 모달 스타일 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center;
+            z-index: 300000; opacity: 0; transition: opacity 0.5s ease;
+        }
+        .modal-box {
+            background: #1a1a1a; padding: 50px; min-width: 660px; text-align: center;
+            transform: scale(0.8); transition: transform 0.5s; border: 1px solid #333;
+        }
+        .modal-text { font-size: 22px; line-height: 1.6; color: #fff; word-break: keep-all; }
+        .modal-close-hint { margin-top: 30px; font-size: 17px; color: #666; cursor: pointer; }
+
+        /* 네비게이션 버튼 */
+        .nav-btns {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding: 0 30px 20px; z-index: 200000; pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        .nav-btns a { pointer-events: all; display: block; opacity: 1 !important; cursor: pointer;}
+        .nav-btns img { height: 50px; opacity: 0.8; transition: transform 0.2s, opacity 0.2s; }
+        .nav-btns img:hover { transform: scale(1.1); opacity: 1; }
+
+    </style>
+</head>
+<body>
+<audio id="lastBGM" src="last_bg.mp3" loop preload="auto"></audio>
+    <div class="bg-container">
+        <div id="bg-scene1"></div>
+        <div id="bg-scene2"><div class="funeral-overlay"></div></div>
+        <div id="bg-scene3"><div class="win-overlay"></div></div>
+        <div id="bg-scene4"></div>
+    </div>
+
+    <header id="mainHeader">
+        1994년 5월 1일
+    </header>
+
+    <div class="content-wrapper">
+        
+        <div id="scene1">
+            <div class="text-container">
+                <span class="text-line" style="transition-delay: 0.5s;">
+                    그리고 그것이 세나의 마지막 모습이었다.
+                </span>
+                <span class="text-line" style="transition-delay: 1.5s;">
+                    세나는 응급 처치를 받고 곧바로 응급헬기를 타고<br>
+                    볼로냐에 위치한 마조레 병원으로 이송됐지만
+                </span>
+                <span class="text-line" style="transition-delay: 2.5s;">
+                    오후 6시 40분, 끝내 사망 판정을 받아 세상을 떠났다.
+                </span>
+            </div>
+        </div>
+
+        <div id="scene2">
+            <div class="left-panel">
+                <div class="photo-frame"><img src="sister.png" alt="Viviane Senna"></div>
+                <div class="desc-group">
+                    <img src="twist_arrow.png" alt="arrow" class="arrow-img">
+                    <p class="desc-text">
+                        장례식에서 세나의 헬멧에 입을 맞추는 여동생의 모습은<br>
+                        아이언맨3에서 페퍼가 아이언맨 헬멧에 얼굴을 맞추는 장면에 <br>영감을 줬다고 밝혀졌다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <h1 class="section-title">사인으로 추정되는 세 가지 원인</h1>
+                <div class="letters-container">
+                    <div class="letter-item" onclick="openLetter(1)"><img id="letter-img-1" src="letter.png"></div>
+                    <div class="letter-item" onclick="openLetter(2)"><img id="letter-img-2" src="letter.png"></div>
+                    <div class="letter-item" onclick="openLetter(3)"><img id="letter-img-3" src="letter.png"></div>
+                </div>
+                <div id="finalText" class="final-mystery-text">
+                    세나의 레이스 카가 왜 갑자기 그 코너에서 이상한 움직임을 보이며 충돌했는지는 아직도 미스터리로 남아있다.<br><br>
+                    당시 세나의 소속팀이었던 <strong>윌리엄스</strong>는 FIA의 조사를 받았고, 
+                    여러 관계자가 처벌받거나<br>F1을 떠났지만 정확히 무엇 때문에 세나가 거기서 그립을 잃었는지는 알 수가 없었다.
+                </div>
+            </div>
+        </div>
+
+        <div id="scene3">
+            <h2 id="introTextS3" class="intro-text-s3">아일톤 세나는 그의 짧은 활동 기간 1984년 ~ 1994년 동안 레전드로 남을 업적을 세웠다.</h2>
+            <div class="polaroid-container">
+                <img id="p1" class="polaroid-img" src="Group 49.png" alt="World Champion">
+                <img id="p4" class="polaroid-img" src="Group 50.png" alt="41 Wins">
+                <img id="p3" class="polaroid-img" src="Group 51.png" alt="Monaco King">
+                <img id="p2" class="polaroid-img" src="Group 52.png" alt="Pole Position">
+            </div>
+        </div>
+
+        <div id="scene4">
+            <div id="legacyText" class="legacy-text">
+                세나의 사망 이후 <strong>FIA는 안전규정을 대폭 강화</strong>하였고,<br>
+                이러한 수많은 변화들은 F1을 1994년 이후 약 20년 이상<br>
+                드라이버 사망 사고 없이 진행된 스포츠로 만들었으며,<br><br>
+                <strong>이는 아일톤 세나가 남긴 가장 위대한 유산 중 하나다.</strong>
+            </div>
+
+            <div id="tributeContainer" class="tribute-container">
+                <img src="senna.png" alt="Ayrton Senna" class="tribute-img">
+                <div class="tribute-info">
+                    <h1>Ayrton Senna</h1>
+                    <p class="dates">1960. 03. 21. — 1994. 05. 01.</p>
+                    <p class="honor">브라질의 영원한 영웅, 아일톤 세나를 기리며</p>
+                </div>
+            </div>
+
+            <div id="footerGroup" class="footer-group">
+                <div class="end-badge">THE END</div>
+                <button class="restart-btn" onclick="location.href='index.html'">
+                     처음으로 돌아가기
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-btns" id="bottomNav">
+        <a href="chapter6.html" class="btn-back"><img src="btn_back.png" alt="Back"></a>
+        <a id="btnForward" class="btn-forward"><img src="btn_forward.png" alt="Next"></a>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <p id="modalContent" class="modal-text"></p>
+            <p class="modal-close-hint" onclick="closeModal()">[ 닫기 ]</p>
+        </div>
+    </div>
+
+<script>
+    // 변수 설정
+        let currentScene = 1;
+        const mainHeader = document.getElementById('mainHeader');
+        const btnForward = document.getElementById('btnForward');
+        const bottomNav = document.getElementById('bottomNav');
+        const lastBGM = document.getElementById('lastBGM');
+        const BGM_VOLUME = 0.8; // BGM 볼륨 설정 (원하는 크기로 조정 가능)
+
+        // Scene 관련 요소
+        const scenes = {
+            1: { el: document.getElementById('scene1'), bg: document.getElementById('bg-scene1') },
+            2: { el: document.getElementById('scene2'), bg: document.getElementById('bg-scene2') },
+            3: { el: document.getElementById('scene3'), bg: document.getElementById('bg-scene3') },
+            4: { el: document.getElementById('scene4'), bg: document.getElementById('bg-scene4') }
+        };
+
+        // 초기 로딩
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+            setTimeout(() => { mainHeader.style.opacity = '1'; }, 100);
+       if (lastBGM) {
+        lastBGM.volume = BGM_VOLUME;
+        // 사용자 상호작용 없이 재생을 시도합니다. (브라우저 정책에 따라 실패할 수 있음)
+        lastBGM.play().catch(e => console.log("BGM playback failed:", e));
+    }
+    
+    const lines = document.querySelectorAll('.text-line');
+            
+            lines.forEach(line => {
+                line.style.opacity = '1';
+                line.style.transform = 'translateY(0)';
+            });
+        });
+
+        // 장면 전환 로직
+        btnForward.addEventListener('click', () => {
+            if (currentScene === 1) {
+                switchScene(1, 2, "사인에 대한 의문과 미스터리");
+            } else if (currentScene === 2) {
+                switchScene(2, 3, "아일톤 세나의 업적"); 
+            } else if (currentScene === 3) {
+                switchScene(3, 4, ""); // Scene 4 엔딩
+            }
+        });
+
+        function switchScene(from, to, headerTitle) {
+            currentScene = to;
+
+            // 이전 장면 퇴장
+            scenes[from].el.style.opacity = '0';
+            scenes[from].bg.style.opacity = '0';
+            scenes[from].el.style.pointerEvents = 'none';
+
+            // 헤더 잠시 숨김
+            mainHeader.style.opacity = '0';
+
+            setTimeout(() => {
+                scenes[from].el.style.display = 'none'; // 공간 제거
+
+                // 새 배경 및 헤더 설정
+                scenes[to].bg.style.opacity = '1';
+                
+                // Scene 4일 경우 헤더와 하단네비 숨기기
+                if (to === 4) {
+                    mainHeader.style.display = 'none';
+                    bottomNav.style.opacity = '0';
+                    bottomNav.style.pointerEvents = 'none';
+                } else {
+                    mainHeader.textContent = headerTitle;
+                    mainHeader.style.display = 'block'; 
+                    mainHeader.style.opacity = '1';
+                }
+
+                // 새 장면 등장
+                scenes[to].el.classList.add('active');
+
+                // 애니메이션 트리거
+                if(to === 3) playScene3Animation();
+                if(to === 4) playScene4Animation();
+
+            }, 1000);
+        }
+
+        function playScene3Animation() {
+            const title = document.getElementById('introTextS3');
+            const p1 = document.getElementById('p1');
+            const p2 = document.getElementById('p2');
+            const p3 = document.getElementById('p3');
+            const p4 = document.getElementById('p4');
+
+            setTimeout(() => { title.style.opacity = '1'; title.style.transform = 'translateY(0)'; }, 500);
+            setTimeout(() => { p1.classList.add('show'); }, 1000);
+            setTimeout(() => { p4.classList.add('show'); }, 1400);
+            setTimeout(() => { p3.classList.add('show'); }, 1800); 
+            setTimeout(() => { p2.classList.add('show'); }, 2200);
+        }
+
+        function playScene4Animation() {
+            const legacyText = document.getElementById('legacyText');
+            const tribute = document.getElementById('tributeContainer');
+            const footer = document.getElementById('footerGroup');
+
+            // 1. 유산 텍스트 등장
+            setTimeout(() => { legacyText.classList.add('show'); }, 500);
+
+            // 2. 추모(이미지+이름) 등장 (텍스트 다 읽을 시간 줌)
+            setTimeout(() => { tribute.classList.add('show'); }, 3000);
+
+            // 3. 엔딩 배지 및 버튼 등장
+            setTimeout(() => { footer.classList.add('show'); }, 5000);
+        }
+
+
+        // 편지 로직
+        const causes = {
+            1: "첫 번째는 타이어 한 개가 튕겨나가 세나의 헬멧을 강타하여<br>헤드레스트로 머리를 밀쳐내 <strong>두개골 골절</strong>을 일으킨 것",
+            2: "두 번째는 구동축에서 파편이 튕겨져 나와 세나의 헬멧을 뚫어<br><strong >두부에 손상</strong>을 입힌 것",
+            3: "마지막은 레이스 카의 부품이 바이저를 뚫고<br>세나의 <strong>오른쪽 눈 위를 가격</strong>한 것"
+        };
+        let openedCount = 0;
+        const openedLetters = { 1: false, 2: false, 3: false };
+        const openImgSrc = 'open.png'; 
+
+        function openLetter(id) {
+            if (openedLetters[id]) { showModal(causes[id]); return; }
+            document.getElementById(`letter-img-${id}`).src = openImgSrc;
+            openedLetters[id] = true;
+            openedCount++;
+            setTimeout(() => { showModal(causes[id]); }, 500);
+        }
+
+        function showModal(htmlContent) {
+            const modal = document.getElementById('modalOverlay');
+            const content = document.getElementById('modalContent');
+            const box = modal.querySelector('.modal-box');
+            content.innerHTML = htmlContent;
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; box.style.transform = 'scale(1)'; }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modalOverlay');
+            const box = modal.querySelector('.modal-box');
+            modal.style.opacity = '0'; box.style.transform = 'scale(0.8)';
+            setTimeout(() => { modal.style.display = 'none'; checkAllOpened(); }, 500);
+        }
+
+        function checkAllOpened() {
+            if (openedCount === 3) {
+                const finalText = document.getElementById('finalText');
+                setTimeout(() => { finalText.classList.add('show'); }, 200);
+            }
+        }
+    </script>
+</body>
+</html>
