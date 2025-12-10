@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chapter 3 – 맥라렌 이적과 라이벌의 탄생</title>
+
+  <!-- 폰트: Pretendard + Shadows Into Light -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600&family=Shadows+Into+Light&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: "Pretendard";
+      overflow: hidden; /* 한 화면 고정 */
+    }
+
+    /* 상단 헤더 (앞 챕터랑 톤 맞게) */
+    header {
+      width: 100%;
+      padding: 18px 0;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.9);
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    main {
+      width: 100%;
+      height: calc(100vh - 60px); /* 헤더 제외 화면 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav {
+        position: fixed;
+        bottom: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        z-index: 20;
+    }
+
+    .nav img {
+        width: 120px;
+        cursor: pointer;
+    }
+    .nav-btns {
+      position: fixed;
+      bottom: 0;         /* 📌 화면 바닥에 붙임 */
+      left: 0;
+      width: 100%;       /* 화면 전체 폭 사용 */
+      display: flex;
+      justify-content: space-between; /* back = 왼쪽 / forward = 오른쪽 */
+      align-items: flex-end;
+      padding: 0 30px 20px; /* 좌우 30px, 아래 20px 여백 */
+      z-index: 9999;     /* 📌 최상단 요소 */
+      pointer-events: none; /* 기본 클릭 막기 */
+    }
+
+    /* 개별 버튼만 클릭 가능하게 */
+    .nav-btns a {
+      pointer-events: all;
+      display: block;
+    }
+
+    /* 버튼 크기 조절 */
+    .nav-btns img {
+      height: 50px;  /* 이미지 크기 조절 */
+      opacity: 0.9;
+      transition: transform .2s, opacity .2s ease;
+    }
+
+    /* hover 효과 */
+    .nav-btns img:hover {
+      transform: scale(1.08);
+      opacity: 1;
+    }
+
+    /* ───── 배경 사진 영역 ───── */
+    .mclaren-scene {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+      background-image: url("ch3_rivary.png"); /* 👉 너의 파일명으로 수정 */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .mclaren-scene img.bg-photo {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* 1988 world drivers' champion winner 메모 */
+    .champion-note {
+      position: absolute;
+      left: 11%;
+      top: 20%;
+      font-family: "Shadows Into Light", cursive;
+      font-size: 32px;
+      line-height: 1.3;
+      white-space: pre-line;
+    }
+
+    /* 검은 박스 공통 */
+    .info-box {
+      position: absolute;
+      left: 4%;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 18px 26px;
+      max-width: 420px;
+      font-size: 20px;
+      line-height: 1.6;
+        
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+
+    .info-box strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .info-box.top {
+      top: 42%;
+    }
+
+    .info-box.bottom {
+      top: 62%;
+    }
+    /* 기존 1번째 장면을 위로 살짝 밀기 위한 트랜지션 */
+    .mclaren-scene {
+      position: relative; /* 이미 있을 수도 있는데 있으면 중복 X */
+      transition: transform 0.9s cubic-bezier(0.19, 1, 0.22, 1),
+                  filter 0.9s cubic-bezier(0.19, 1, 0.22, 1);
+      z-index: 1;
+    }
+
+    /* 타이핑 끝나면 적용할 상태 */
+    .mclaren-scene.slide-up {
+      transform: translateY(-12%);   /* 살짝 위로 밀기 */
+      filter: brightness(0.8);
+      transition-delay: 1s       /* 조금 어둡게 */
+    }
+
+    /* RIVALRY 오버랩 장면 */
+    .rivalry-scene {
+      position: absolute;
+      inset: 0;
+      background-image: url("ch3_rivary2.png");  /* 👉 두 번째 이미지 파일 이름 */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: translateY(100%);   /* 처음엔 화면 아래에 숨겨둠 */
+      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+      z-index: 2;
+      transition-delay: 1s
+    }
+    /* chapter3.html - <style> 섹션 내부에 추가 */
+
+    /* ▼ [3] 프로스트 카드 컨테이너 스타일 ▼ */
+    .prost-card-container {
+        position: absolute;
+        right: 5%; 
+        bottom: 14%; 
+        width: 420px; 
+        background: #000;
+        border: 3px solid #000; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        z-index: 10;
+        padding: 0px;
+        opacity: 0; /* 투명하게 숨김 */
+        pointer-events: none; /* 클릭 이벤트 비활성화 */
+        transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+    .prost-card-container.visible {
+        opacity: 1; /* 등장 시 보이게 함 */
+        pointer-events: all; /* 클릭 이벤트 활성화 */
+        transform: translateY(0);
+    }
+
+    .prost-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        /* 이미지 리스트를 담을 영역 (슬라이드 구현을 위해) */
+    }
+
+    .prost-photo {
+        width: 100%;
+        height: auto;
+        display: block;
+        padding: 0px;
+        transition: transform 0.3s ease-in-out; /* 슬라이드 애니메이션 */
+    }
+
+    /* ▼ [4] 슬라이드 버튼 스타일 ▼ */
+    .prost-nav-buttons {
+        display: flex;
+        justify-content: center;
+        padding: 4px 0;
+        background: #000; /* 하단 검정 바 */
+    }
+
+    .nav-arrow {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        margin: 0 15px;
+        padding: 5px 10px;
+        transition: color 0.1s;
+    }
+
+    .nav-arrow:hover {
+        color: #ff0000; /* 호버 색상 (예시) */
+    }
+
+    /* 위로 슬라이드 인될 때 상태 */
+    .rivalry-scene.show {
+      transform: translateY(0);
+    }
+
+    .rivalry-card {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      padding: 20px 40px;
+      max-width: 520px;
+      text-align: center;
+      line-height: 1.6;
+      font-size: 18px;
+    }
+
+    .rivalry-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .play-video-btn {
+      position: absolute;
+      left: 50%;
+      top: 130%;
+      transform: translate(-50%, -50%);
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .play-video-btn img {
+      display: block;
+      width: 220px;       /* 필요하면 크기 조절 */
+      height: auto;
+      filter: drop-shadow(0 0 12px rgba(0,0,0,0.6));
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .play-video-btn:hover img {
+      transform: translateY(-2px) scale(1.03);
+      filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+    }
+
+    /* chapter3.html - <style> 섹션 내, .video-overlay 규칙 */
+    .video-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        /* ▼ [수정] 수직 중앙 정렬로 복원 ▼ */
+        display: flex;
+        
+        align-items: center; /* 수평 정렬 */
+        justify-content: flex-start; /* 수직 정렬을 상단으로 변경 */
+        padding-top: 80px; /* 화면 상단에서 50px 여백 확보 */ 
+
+        opacity: 0;
+        pointer-events: none;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+        flex-direction: column; /* 요소들을 수직으로 배치 */
+    }
+
+    .video-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .video-inner {
+      position: relative;
+      max-width: 900px;
+      width: 80vw;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      
+      /* 비디오가 캡션과 Next 버튼을 수용하도록 높이를 확보 */
+      display: flex;
+      flex-direction: column;
+  }
+    
+
+    .video-inner video {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #000;
+    }
+
+    .video-close {
+      position: absolute;
+      top: -52px;
+      right: -2px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 52px !important;
+      cursor: pointer;
+      z-index: 9999;
+      opacity: 0.8;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .chapter-nav {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 40px;
+      z-index: 30;
+    }
+
+    .nav-btn {
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .nav-btn img {
+      display: block;
+      height: 40px;
+      width: auto;
+    }
+
+    .nav-btn:hover {
+      transform: translateY(-3px);
+      opacity: 0.85;
+    }
+    /* 처음 화면은 어둡게 */
+    .spotlight-overlay {
+      position: fixed;
+      inset: 0;
+      background: black;
+      pointer-events: none;
+      z-index: 9999;
+      transition: opacity 0.2s linear, background 0.05s linear; /* 👈 opacity도 부드럽게 */
+      opacity: 1; /* 처음엔 완전 어두움 */
+    }
+
+    /* 다 밝아진 뒤 상태 */
+    .spotlight-overlay.fully-revealed {
+      opacity: 0;
+    }
+    /* ▶ 비디오 오버레이 하단 next 버튼 영역 */
+    .video-footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-next-scene {
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .btn-next-scene img {
+      display: block;
+      width: 220px;   /* 필요하면 크기 조절 */
+    }
+
+    /* ▶ 마지막 스즈카 장면 오버레이 */
+    .final-scene-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;                 /* 기본은 숨김 */
+      align-items: center;
+      justify-content: center;
+      z-index: 1300;
+      background: rgba(0, 0, 0, 0.85);
+    }
+
+    .final-scene-overlay.visible {
+      display: flex;
+    }
+
+    .final-scene {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background-image: url("ch3_last_scene.png"); /* 배경 이미지 */
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* 오른쪽 아래 설명 카드 */
+    .final-info-card {
+      position: absolute;
+      right: 5%;
+      bottom: 11%;
+      max-width: 470px;
+      background: rgba(240, 238, 232, 0.95);
+      color: #222;
+      padding: 18px 24px;
+      font-size: 18px;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    /* 왼쪽 위 서킷 가이드 종이 (필요 없으면 삭제해도 됨) */
+    .final-map {
+      position: absolute;
+      left: 0%;
+      top: 0%;
+      width: 440px;
+      transform: rotate(-5deg);
+    }
+    /* chapter3.html - <style> 섹션 내부에 추가 */
+
+    /* ▼ [2] 비디오 해설 캡션 스타일 ▼ */
+    .video-caption-box {
+        color: #333;
+        max-width: 900px;
+        padding: 15px 20px;
+        font-size: 15px;
+        line-height: 1.5;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        background: rgba(255, 255, 255, 0.9);
+        margin-top: 30px;
+        position: center;
+        
+        /* 처음에는 숨김 (비디오 재생 버튼 누를 때 나타나게 할 경우) */
+        opacity: 0; 
+        transition: opacity 0.5s ease;
+      
+    }
+
+    .video-caption-box.show {
+        opacity: 1;
+    }
+    /* chapter3.html - <style> 섹션 내, .video-footer 규칙 */
+    .video-footer {
+        margin-top: 15px; /* 캡션 박스와의 간격 확보 */
+        display: flex;
+        justify-content: center;
+    }
+    .intro-title {
+    /* ... 기존 스타일 ... */
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      
+      /* ⭐⭐ 화면 중앙 정렬을 위한 핵심 코드 ⭐⭐ */
+      display: flex;             /* 1. Flex 컨테이너로 지정 */
+      align-items: center;       /* 2. 수직(세로) 중앙 정렬 */
+      justify-content: center;   /* 3. 수평(가로) 중앙 정렬 */
+      
+      color: #fff;
+      font-size: 22px;
+      font-weight: 500;
+  }
+  /* chapter3.html - <style> 섹션 내부 (final-scene-overlay 아래에 추가) */
+
+    /* ▼ 스티커 기본 스타일 및 숨김 상태 ▼ */
+    .final-sticker {
+        position: absolute;
+        top: 50%;
+        right: 100%; /* 화면 오른쪽 바깥에서 시작 */
+        transform: translateY(-50%) scale(0.8);
+        opacity: 0;
+        z-index: 1500;
+        transition: opacity 0.1s ease;
+    }
+
+    .final-sticker img {
+        width: 450px; /* 스티커 크기 조정 */
+        height: auto;
+    }
+
+    /* ▼ 스티커 등장 애니메이션 정의 ▼ */
+    @keyframes stickerFlyIn {
+        0% {
+            opacity: 0;
+            transform: translate(0, -50%) scale(0.4) rotate(5deg);
+        }
+        100% {
+            opacity: 1;
+            transform: translate(600px, -50%) scale(1) rotate(0deg);
+        }
+    }
+
+    /* ▼ 스티커 등장 상태 클래스 ▼ */
+    .final-scene-overlay.visible #finalSticker {
+        animation: stickerFlyIn 1.2s cubic-bezier(0.1, 0.7, 0.4, 1.2) forwards;
+    }
+    /* chapter3.html - <style> 섹션 내부 (어디든 추가 가능) */
+
+    /* ⭐ [추가] 다음 장면 버튼 위치 및 스타일 ⭐ */
+    .scene-transition-btn {
+        position: absolute; 
+        bottom: 50px; /* 화면 하단에서 30px 위 */
+        left: 50%; 
+        transform: translateX(-50%); /* 정확한 수평 중앙 정렬 */
+        z-index: 100; 
+        
+        /* 스타일 */
+        padding: 10px 20px; 
+        font-size: 16px; 
+        background: #fff; 
+        color: #000; 
+        border: none; 
+        cursor: pointer; 
+        
+        display: none; /* JS에서 block으로 변경할 예정 */
+        transition: all 0.2s ease;
+    }
+
+    .scene-transition-btn:hover {
+        background: #e0e0e0;
+    }
+
+   
+  </style>
+</head>
+<body>
+  <audio id="bgm" src="ch3_bgm.mp3" loop></audio>
+  <audio id="typingSfx" src="ch3_typing.mp3"></audio>
+  <audio id="finalSceneSound" src="dadan.mp3" preload="auto"></audio>
+  <header>
+    맥라렌 이적과 '전설적인 라이벌'의 탄생 (1988년 ~ 1989년)
+  </header>
+  <div class="spotlight-overlay">
+    <p class="intro-title"> 맥라렌 이적과 '전설적인 라이벌'의 탄생 (1988년 ~ 1989년)</p>
+  </div>
+
+  <main>
+    <section class="mclaren-scene">
+      <!-- 👉 여기 파일 이름을 네가 저장한 이미지 이름으로 바꿔줘 -->
+
+      <!-- 손글씨 텍스트 -->
+      <div class="champion-note">
+      1988 world drivers'
+      champion winner
+      </div>
+
+      <!-- 상단 info 박스 -->
+      <div class="info-box top">
+        <strong>드림팀 결성 (1988년)</strong>
+        <span id="infoTopText"></span>
+      </div>
+
+      <div class="info-box bottom">
+        <strong>첫 챔피언 (1988년)</strong>
+        <span id="infoBottomText"></span>
+      </div>
+      <button id="nextSceneBtn" class="scene-transition-btn">
+        다음 장면 ▶
+    </button>
+    <div class="prost-card-container">
+        <div class="prost-image-wrapper">
+            <img id="prostImage" src="ch3_prost1.png" alt="알랭 프로스트 사진" class="prost-photo">
+        </div>
+        
+        <div class="prost-nav-buttons">
+            <button id="prostPrevBtn" class="nav-arrow prev">◀</button>
+            <button id="prostNextBtn" class="nav-arrow next">▶</button>
+        </div>
+    </div>
+    </section>
+    <section class="rivalry-scene">
+      <div class="rivalry-card">
+        <strong>숙명의 대결 (1989년)</strong>
+        하지만 라이벌 관계는 극에 달했고, 챔피언십을 두고<br>일본 스즈카 서킷에서 열린
+        결정적인 레이스에서<br>두 선수는 충돌 사고를 일으키며 역사적인 장면을 남겼다.
+        <button id="playVideoBtn" class="play-video-btn">
+        <img src="ch3_play_video.png" alt="play video">
+      </button>
+      </div>
+      <!-- 🎬 비디오 오버레이 -->
+    <div id="videoOverlay" class="video-overlay">
+      
+      <div class="video-inner"> 
+        <button class="video-close">&times;</button>
+        <video id="rivalryVideo" src="ch3_suzuka.mp4" controls></video>
+        
+        <div id="videoCaption" class="video-caption-box">
+            <p>
+                1989년 스즈카 그랑프리는 세나와 프로스트의 챔피언십을 결정짓는 레이스였다.<br>
+                당시 레이스를 지배하던 프로스트를 따라잡기 위해 세나는 무리한 추월을 시도했고, 이 충돌로 인해 프로스트는 리타이어하였고 세나는 다시 출발을 하게 되면서 1위로 들어온 것처럼 보였다.
+            </p>
+        </div>
+        
+      </div>
+
+          <!-- ▶ 비디오 아래 next 버튼 -->
+      <div class="video-footer">
+      <button class="btn-next-scene">
+        <img src="ch3_btn_next.png" alt="next">
+      </button>
+    </div>
+    </div>
+
+    </section>
+
+    <!-- ▶ 마지막 스즈카 장면 오버레이 -->
+    <div class="final-scene-overlay" id="finalScene">
+      <div class="final-scene">
+      <img class="final-map" src="ch3_suzuka_map.png" alt="Suzuka map"> -->
+      <div id="finalSticker" class="final-sticker">
+            <img src="crash.png" alt="Final Sticker" />
+          </div>
+
+        <div class="final-info-card">
+          하지만 결론적으로는 세나가 실격 처리되면서 프로스트가 챔피언을
+          차지하게 되었고, 이 사건은 F1 역사상 가장 논란이 많은 순간
+          중 하나로 기록된다.
+        </div>
+      </div>
+    </div>
+
+    <!-- back / forward 버튼 -->
+    <div class="nav-btns">
+      <a href="index.html" class="btn-back">
+        <img src="btn_back.png" alt="back">
+      </a>
+      <a href="chapter4.html" class="btn-forwards">
+        <img src="btn_forward.png" alt="forward">
+      </a>
+    </div>
+  </main>
+  <script>
+    /* ================================
+       기본 요소들 선택
+    ================================= */
+    const mclarenScene = document.querySelector(".mclaren-scene");
+    const rivalryScene = document.querySelector(".rivalry-scene");
+
+    const spotlight = document.querySelector(".spotlight-overlay");
+
+    const bgm = document.getElementById("bgm");
+    const typingSfx = document.getElementById("typingSfx");
+
+    const infoTopEl = document.getElementById("infoTopText");
+    const infoBottomEl = document.getElementById("infoBottomText");
+    const nextSceneBtn = document.getElementById("nextSceneBtn"); // 새로 추가된 버튼 변수
+    // ▼ [3] 새로운 캡션 요소 변수 추가 (스크립트 상단에 추가) ▼
+    const videoCaptionBox = document.getElementById("videoCaption");
+
+    bgm.volume = 0;
+
+    const finalSceneSound = document.getElementById("finalSceneSound"); 
+
+    // ⭐ [추가] 최종 스티커 요소 참조
+    const finalSticker = document.getElementById("finalSticker");
+
+    /* ================================
+       상태값
+    ================================= */
+    let revealProgress = 0;
+    let typingStarted = false;
+    let musicStarted = false;
+
+    /* ================================
+       텍스트 원문
+    ================================= */
+    const infoTopFull =
+      "당대 최고의 팀이었던 맥라렌(McLaren)으로 이적하여 알랭 프로스트와 듀오를 맺었다.";
+    const infoBottomFull =
+      "세나는 프로스트와의 치열한 경쟁 끝에 8승을 거두며 생애 첫 드라이버 챔피언십 우승을 차지";
+
+    /* ================================
+       🎵 BGM 페이드 인/아웃
+    ================================= */
+    function fadeInMusic(duration = 5000) {
+      const stepTime = 80;
+      const steps = duration / stepTime;
+      const volumeStep = 1 / steps;
+
+      let currentVolume = 0;
+      bgm.play().catch(() => {});
+
+      const fade = setInterval(() => {
+        currentVolume += volumeStep;
+        if (currentVolume >= 1) {
+          currentVolume = 1;
+          clearInterval(fade);
+        }
+        bgm.volume = currentVolume;
+      }, stepTime);
+    }
+
+    function fadeOutMusic(duration = 2000) {
+      const stepTime = 80;
+      const steps = duration / stepTime;
+      const volumeStep = bgm.volume / steps;
+
+      const fade = setInterval(() => {
+        let v = bgm.volume - volumeStep;
+        if (v <= 0) {
+          bgm.volume = 0;
+          bgm.pause();
+          clearInterval(fade);
+        } else {
+          bgm.volume = v;
+        }
+      }, stepTime);
+    }
+
+    /* ================================
+       ✏️ 타이핑 + 효과음
+    ================================= */
+    function startTypingSound() {
+      typingSfx.currentTime = 0;
+      typingSfx.volume = 0.35;
+      typingSfx.loop = true;
+      typingSfx.play().catch(() => {});
+    }
+
+    function stopTypingSound() {
+      typingSfx.pause();
+      typingSfx.currentTime = 0;
+    }
+
+    function typeText(element, fullText, speed, onComplete) {
+      element.textContent = "";
+      let i = 0;
+
+      const typing = setInterval(() => {
+        element.textContent += fullText.charAt(i);
+        i++;
+        if (i >= fullText.length) {
+          clearInterval(typing);
+          if (onComplete) onComplete();
+        }
+      }, speed);
+    }
+
+    /* ================================
+       ✏️ 두 줄 타이핑 진행
+    ================================= */
+    function startTypingSequence() {
+      if (typingStarted) return;
+      typingStarted = true;
+
+      const topBox = document.querySelector(".info-box.top");
+      const bottomBox = document.querySelector(".info-box.bottom");
+
+      topBox.style.opacity = 1;
+      topBox.style.transform = "translateY(0)";
+
+      startTypingSound();
+
+      typeText(infoTopEl, infoTopFull, 120, () => {
+        setTimeout(() => {
+          bottomBox.style.opacity = 1;
+          bottomBox.style.transform = "translateY(0)";
+
+          typeText(infoBottomEl, infoBottomFull, 120, () => {
+            stopTypingSound();
+
+           if (nextSceneBtn) {
+                   nextSceneBtn.style.display = 'block';}
+            if (prostCardContainer) {
+                    prostCardContainer.classList.add('visible');
+                }
+
+          });
+        }, 350);
+      });
+    }
+    // chapter3.html - <script> 섹션 내부 (스크립트 하단에 추가)
+
+    if (nextSceneBtn) {
+        nextSceneBtn.addEventListener("click", () => {
+            nextSceneBtn.style.display = 'none'; // 버튼 숨기기
+            
+            // 버튼을 눌렀을 때만 rivalry-scene이 올라오도록 처리
+            if (mclarenScene && rivalryScene) {
+                mclarenScene.classList.add("slide-up"); // 기존 배경을 위로 올리고 어둡게
+                rivalryScene.classList.add("show");     // 라이벌 장면을 아래에서 위로 오버랩
+            }
+        });
+    }
+
+    /* ================================
+       🔦 spotlight 밝아지기 효과
+    ================================= */
+    document.addEventListener("mousemove", (e) => {
+      const x = e.clientX;
+      const y = e.clientY;
+
+      spotlight.style.background = `
+        radial-gradient(circle at ${x}px ${y}px,
+          transparent 0%,
+          transparent 8%,
+          black 18%,
+          black 100%)
+      `;
+
+      if (revealProgress < 1) {
+        revealProgress += 0.03;
+        spotlight.style.opacity = 1 - revealProgress;
+
+        if (revealProgress >= 1) {
+          spotlight.classList.add("fully-revealed");
+
+          setTimeout(() => {
+            spotlight.style.display = "none";
+            fadeInMusic();         
+            startTypingSequence();
+          }, 320);
+        }
+      }
+    });
+
+    /* ================================
+       🎬 비디오 overlay 제어
+    ================================= */
+    const playVideoBtn = document.getElementById("playVideoBtn");
+    const videoOverlay = document.getElementById("videoOverlay");
+    const rivalryVideo = document.getElementById("rivalryVideo");
+    const videoCloseBtn = document.querySelector(".video-close");
+
+    const nextBtn = document.querySelector(".btn-next-scene");
+    const finalScene = document.getElementById("finalScene");
+    const finalClose = document.querySelector(".final-close");
+
+    /* ▶ 비디오 재생 버튼 */
+    playVideoBtn.addEventListener("click", () => {
+      fadeOutMusic(2000);
+
+      setTimeout(() => {
+        videoOverlay.classList.add("visible");
+        rivalryVideo.currentTime = 0;
+        rivalryVideo.play();
+        // ▼ [수정/추가] 캡션 박스 노출 ▼
+        if (videoCaptionBox) videoCaptionBox.classList.add("show");
+      }, 600);
+    });
+
+    /* ▶ 비디오 닫기 공통 함수 */
+    function closeVideo() {
+      rivalryVideo.pause();
+      rivalryVideo.currentTime = 0;
+      videoOverlay.classList.remove("visible");
+      if (videoCaptionBox) videoCaptionBox.classList.remove("show");
+  }
+
+    /* X 버튼 */
+    videoCloseBtn.addEventListener("click", closeVideo);
+
+    /* 오버레이 배경 클릭해도 닫기 */
+    videoOverlay.addEventListener("click", (e) => {
+      if (e.target === videoOverlay) closeVideo();
+    });
+
+    /* ================================
+       ▶ next 버튼 → 마지막 스즈카 장면
+    ================================= */
+    nextBtn.addEventListener("click", () => {
+      closeVideo();   
+
+      // 1. 최종 장면 효과음 재생
+      if (finalSceneSound) {
+        finalSceneSound.volume = 0.9;
+        finalSceneSound.currentTime = 0;
+        finalSceneSound.play().catch(e => console.log("Audio play blocked."));
+      }               // 영상 닫기
+      finalScene.classList.add("visible");  // 스즈카 화면 열기
+    });
+
+    // chapter3.html - <script> 섹션 내부 (상단 변수 선언 부분)
+
+    // ▼ [5] 프로스트 슬라이드 관련 변수 추가 ▼
+    const prostImageEl = document.getElementById("prostImage");
+    const prostPrevBtn = document.getElementById("prostPrevBtn");
+    const prostNextBtn = document.getElementById("prostNextBtn");
+
+    // 이미지 목록 (추가할 이미지 파일명을 여기에 나열하세요)
+    const prostImages = [
+        "ch3_prost1.png", 
+        "ch3_prost2.png","ch3_prost3.png","ch3_prost4.png"  //
+        // 필요한 다른 이미지 파일명도 여기에 추가
+    ];
+    let currentProstIndex = 0;
+
+
+    // ▼ [6] 슬라이드 기능 함수 ▼
+    function updateProstImage(direction) {
+        // direction: 1 for next, -1 for previous
+        currentProstIndex += direction;
+
+        if (currentProstIndex < 0) {
+            currentProstIndex = prostImages.length - 1; // 끝에서 처음으로
+        } else if (currentProstIndex >= prostImages.length) {
+            currentProstIndex = 0; // 처음에서 끝으로
+        }
+
+        // 이미지 경로 업데이트
+        if (prostImageEl) {
+            prostImageEl.src = prostImages[currentProstIndex];
+        }
+    }
+
+
+    // ▼ [7] 버튼 이벤트 리스너 추가 ▼
+    if (prostPrevBtn) {
+        prostPrevBtn.addEventListener("click", () => {
+            updateProstImage(-1);
+        });
+    }
+
+    if (prostNextBtn) {
+        prostNextBtn.addEventListener("click", () => {
+            updateProstImage(1);
+        });
+    }
+    // chapter3.html - <script> 섹션 내부 (가장 하단)
+
+    // ... (기존 스크립트 코드) ...
+    
+    // 네비게이션 버튼 요소 선택 (href 링크 대신 JS로 제어하기 위함)
+    const navBackBtn = document.querySelector(".btn-back");
+    const navForwardBtn = document.querySelector(".btn-forwards");
+
+
+    // 1. BACK 버튼 클릭 이벤트 수정 (index.html로 이동, 파일 연결 유지)
+    if (navBackBtn) {
+        navBackBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            // BGM 페이드 아웃 (index.html로 이동 시 BGM이 끊기지 않게 하려면)
+            fadeOutMusic(600); 
+
+            // 0.6초 페이드아웃 후 index.html로 이동 (Chapter 2 섹션으로 지정)
+            setTimeout(() => {
+                 // **index.html의 Chapter 2 섹션으로 이동하도록 쿼리 파라미터 사용**
+                 window.location.href = "index.html?section=chapter2"; 
+            }, 600); 
+        });
+    }
+
+    // 2. FORWARD 버튼 클릭 이벤트 수정 (chapter4.html로 이동, 파일 연결 유지)
+    if (navForwardBtn) {
+        navForwardBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            // BGM 페이드 아웃 (chapter4.html로 이동 시 BGM이 끊기지 않게 하려면)
+            fadeOutMusic(600); 
+
+            // 0.6초 페이드아웃 후 chapter4.html로 이동
+            setTimeout(() => {
+                 window.location.href = "chapter4.html"; 
+            }, 600);
+        });
+    }
+    // index.html - <script> 섹션 내부 (startTypingSequence 함수 내부)
+
+    // ▼ [추가] 프로스트 카드 컨테이너 변수 선언 (스크립트 상단 변수 선언부에 추가) ▼
+    const prostCardContainer = document.querySelector(".prost-card-container");
+
+   
+    </script>
+   
+    </script>
+</body>
+</html>
