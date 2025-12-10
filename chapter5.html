@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Chapter 5: 맥라렌의 하향세와 윌리엄스로의 이적</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <style>
+        /* 1. 공통 스타일 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: "Pretendard", sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* 2. 인트로 화면 (확실하게 보이도록 수정) */
+        .intro-section {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0; /* inset 대신 호환성 좋은 속성 사용 */
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999; /* 최상위 우선순위 */
+            opacity: 1;
+            transition: opacity 1.0s ease;
+        }
+
+        /* 인트로 텍스트 스타일 명시 */
+        .intro-text {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 500;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        /* 3. 헤더 */
+        header {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 18px 0;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            font-size: 18px;
+            font-weight: 500;
+            z-index: 100;
+            display: none; /* 인트로 후 등장 */
+        }
+
+        /* 4. 메인 콘텐츠 */
+        main {
+            width: 100%; height: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1.0s ease;
+            flex-direction: column; /* ⭐ [수정] 세로 정렬로 변경 ⭐ */
+        }
+
+        .bg-layer {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            z-index: 1; opacity: 0.6;
+            background-image: url('ch5_bg.png'); /* 나중에 추가 */
+        }
+
+        /* 5. 네비게이션 버튼 */
+        .nav-btns {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding: 0 30px 20px;
+            z-index: 99999;
+            pointer-events: none;
+        }
+        .nav-btns a {
+            pointer-events: all; display: block;
+            opacity: 1; transition: opacity 0.5s ease;
+        }
+        .nav-btns img {
+            height: 50px; opacity: 0.8; transition: transform 0.2s, opacity 0.2s;
+        }
+        .nav-btns img:hover { transform: scale(1.1); opacity: 1; }
+        /* chapter5.html - <style> 내부 추가 */
+
+        /* ▼ [새로 추가] 기술 설명 컨텐츠 박스 스타일 ▼ */
+        .tech-container {
+            position: relative;
+            z-index: 10; /* 배경보다 위에 위치 */
+            width: 90%;
+            max-width: 1000px;
+            background: #1A1919; /* 어두운 배경 */
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 80px;
+            opacity: 0; /* 초기엔 투명 (인트로 후 페이드인) */
+            transform: translateY(20px);
+            transition: opacity 1.0s ease, transform 1.0s ease;
+        }
+
+        /* 등장 애니메이션 클래스 */
+        .tech-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 상단 헤더 영역 */
+        .tech-header {
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 20px;
+            margin-bottom: 10px;
+        }
+
+        .year-badge {
+            background: #F2C500; /* 윌리엄스 옐로우 */
+            color: #000;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 2px;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .tech-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .tech-subtitle {
+            font-size: 18px;
+            font-weight: 400;
+            color: #ccc;
+        }
+
+        /* 본문 영역 (비디오 + 텍스트) */
+        .tech-body {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* 비디오 영역 */
+        .video-wrapper {
+            flex: 1.2;
+            position: relative;
+        }
+
+        .tech-video {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 1px solid #333;
+            background: #000;
+        }
+
+        .video-caption {
+            font-size: 13px;
+            color: #888;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* 텍스트 설명 영역 */
+        .text-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #ddd;
+            padding-top: 10px;
+        }
+
+        .highlight-text {
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 1px solid #F2C500; /* 강조 밑줄 */
+        }
+        /* chapter5.html - <style> 내부 추가 */
+
+        /* ▼ [새로 추가] 윌리엄스 로고 스티커 스타일 ▼ */
+        .williams-sticker {
+            position: absolute;
+            bottom: -40px;  /* 박스 아래로 살짝 튀어나오게 */
+            right: -60px;   /* 박스 오른쪽으로 살짝 튀어나오게 */
+            width: 300px;   /* 로고 크기 (적절히 조절하세요) */
+            height: auto;
+            
+            transform: rotate(-13deg); /* 살짝 기울이기 */
+            z-index: 20;    /* 박스 내용보다 위에 표시 */
+        }
+
+        .btn-next-scene {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+
+            /* 중앙 정렬 및 간격 */
+            align-self: center;
+            margin-top: 30px; 
+            
+            /* 애니메이션 초기 상태 */
+            opacity: 0; 
+            transform: translateY(20px); 
+            transition: transform 0.2s, opacity 1.0s ease;
+            
+            /* ⭐ [수정] 클릭 가능하도록 우선순위 높임 ⭐ */
+            position: relative; 
+            z-index: 49; 
+        }
+
+        .btn-next-scene img {
+            display: block;
+            width: 220px;
+        }
+
+        .btn-next-scene:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-next-scene.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+ /* 도닝턴 섹션 공통 */
+        .story-section {
+            position: absolute;
+            inset: 0;
+            display: none;
+            opacity: 0;
+            transition: opacity 1.0s ease;
+            z-index: 50; /* 맨 위에 오도록 */
+        }
+        .story-section.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .story-bg {
+            position: absolute; inset: 0;
+            background-size: cover; 
+            background-position: center;
+            z-index: 1;
+        }
+        .story-overlay {
+            position: absolute; inset: 0;
+            z-index: 2;
+        }
+
+        /* 콘텐츠 레이아웃 */
+        .story-content {
+            position: relative; 
+            z-index: 3;
+            width: 100%; 
+            height: 100%;
+            display: flex; 
+            flex-direction: row; /* 가로 정렬 */
+            align-items: center;
+            justify-content: space-between; /* 양끝 정렬 */
+            padding: 0 10%; /* 좌우 여백 */
+            gap: 120px; /* 좌우 사이 간격 */
+        }
+
+        /* 1. 제목 스타일 (타이핑/헤드라인 느낌) */
+        .story-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 30px;
+            font-family: 'Pretendard', sans-serif;
+        }
+        /* [추가] 왼쪽 텍스트 영역 너비 제한 */
+        .text-side {
+            flex: 1;
+            min-width: 720px;
+        }
+
+        /* [추가] 오른쪽 비주얼 영역 */
+        .visual-side {
+            flex: 0.8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* [추가] 이미지 컨테이너 (회전 및 배치) */
+        .rotated-images {
+            display: flex;
+            flex-direction: column; /* 세로 병렬 */
+            gap: 80px;
+            transform: rotate(13deg); /* 전체적으로 살짝 회전 */
+            background: #777; /* 살짝 배경 깔아주기 (선택사항) */
+            padding: 60px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .img-logo {
+            width: 250px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .img-circuit {
+            width: 350px;
+            height: auto;
+            display: block;
+            filter: invert(1); /* 지도가 검정 선이라면 흰색으로 반전 (이미지 상태에 따라 제거 가능) */
+            opacity: 0.9;
+        }
+
+        /* [수정] 하이라이트 문구 (타이핑 전/후 스타일) */
+        .highlight-p {
+            margin-top: 20px;
+            font-size: 22px;
+            color: #b71c1c; 
+            line-height: 1.6;
+            font-weight: 600;
+            background: rgba(255, 255, 0, 0.1); 
+            padding: 16px;
+            min-height: 100px; /* 텍스트 없을 때도 공간 유지 */
+            white-space: pre-line; /* 줄바꿈(\n) 인식 */
+        }
+
+        /* 클릭 가능하다는 느낌 */
+        .clickable-quote {
+            cursor: pointer;
+            border: 2px dashed #b71c1c; /* 점선 테두리로 클릭 유도 */
+            transition: background 0.3s;
+        }
+        .clickable-quote:hover {
+            background: rgba(255, 255, 0, 0.2);
+        }
+        .clickable-quote.active {
+            border: none; /* 타이핑 시작되면 테두리 제거 */
+            border-left: 4px solid #b71c1c;
+        }
+
+        /* 클릭 유도 텍스트 */
+        .click-hint {
+            font-size: 16px;
+            color: #555;
+            font-weight: 400;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 2. 텍스트 박스 (종이 질감 배경) */
+        .story-text-box {
+            max-width: 650px;
+            background: #f4f1ea; /* 누런 종이 색 */
+            color: #333; /* 글씨는 검정 */
+            padding: 30px;
+            font-size: 17px;
+            line-height: 1.8;
+            border: 1px solid #dcd9ce;
+            margin-bottom: 30px;
+        }
+
+        .story-text-box strong {
+            color: #000;
+            border-bottom: 2px solid #ea4741; /* 밑줄 강조 */
+        }
+
+        /* 3. 강조 문구 (손글씨 느낌) */
+        .highlight-p {
+            margin-top: 20px;
+            font-size: 22px;
+            color: #b71c1c; /* 붉은색 펜 느낌 */
+            line-height: 1.6;
+            font-weight: 600;
+            background: rgba(255, 255, 0, 0.1); /* 형광펜 느낌 살짝 */
+            padding: 16px;
+        }
+
+        /* 4. 영상 보기 버튼 (심플한 버튼) */
+        .next-btn-styled {
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
+            width: fit-content;
+        }
+        .next-btn-styled:hover {
+            transform: scale(1.05);
+            background: #121212;
+        }
+
+        /* 비디오 모달 (기존 유지) */
+        .video-modal {
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.95);
+            z-index: 9997;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s;
+        }
+        .video-modal.active { opacity: 1; pointer-events: all; }
+        .modal-content { position: relative; width: 80%; max-width: 900px; text-align: center; }
+        .modal-content video { width: 100%; box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+        .close-btn { position: absolute; top: -52px; right: 0; background: none; border: none; color: #fff; font-size: 52px; cursor: pointer; }
+        .modal-caption { margin-top: 15px; color: #aaa; font-size: 16px; }
+
+        /* --- [새로 추가] 편지 봉투 및 메시지 모달 스타일 --- */
+        /* 편지 봉투 위치 및 떨림 효과 */
+        .letter-container {
+            position: absolute;
+            /* 이미지의 맥라렌 차량 사이드포드 위치에 맞춰 조정 */
+            bottom: 27%;
+            left: 44%;
+            z-index: 60; /* 다른 요소들보다 위에 표시 */
+        }
+
+        .letter-image {
+            width: 150px; /* 적절한 크기로 조절 */
+            height: auto;
+            cursor: pointer;
+            /* 초기 떨림 효과 */
+            animation: shake 2s infinite;
+        }
+
+        /* 떨림 애니메이션 키프레임 */
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(-3deg); }
+            20%, 40%, 60%, 80% { transform: rotate(3deg); }
+        }
+
+        /* 메시지 모달 오버레이 */
+        .message-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85); /* 어두운 배경 */
+            display: none; /* 초기에는 숨김 */
+            justify-content: center;
+            align-items: center;
+            z-index: 9998; /* 최상위 레이어 */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* 메시지 이미지 */
+        .message-image {
+            max-width: 60%;
+            max-height: 60%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            /* 등장 애니메이션 초기 상태 */
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        /* 메시지 등장 시 클래스 */
+        .message-modal.show .message-image {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* 1994 섹션 전용 레이아웃: 세로 정렬 */
+        .story-content.column-layout {
+            flex-direction: column;
+            justify-content: center;
+            gap: 40px;
+            text-align: center;
+        }
+
+        /* 붉은색 뱃지 */
+        .year-badge.red {
+            background: #b71c1c;
+            color: #fff;
+        }
+
+        .nightmare-title {
+            font-size: 40px;
+            font-weight: 800;
+            margin-top: 15px;
+            color: #f4f1ea;
+        }
+
+        /* 텍스트 박스: 어둡고 무거운 느낌 */
+        .nightmare-text-box {
+            max-width: 800px;
+            background: black;
+            padding: 40px;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #ccc;
+        }
+
+        /* 중간 구분선 */
+        .broken-line {
+            border: 0;
+            height: 1px;
+            background: #555;
+            margin: 30px 0;
+        }
+
+        /* 경고 텍스트 */
+        .warning-text {
+            color: #ff3333;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: 1px;
+        }
+
+    </style>
+</head>
+<body>
+     <audio id="ch5BGM" src="ch5_bg.mp3" loop preload="auto"></audio>
+
+
+    <section id="introSection" class="intro-section">
+        <div id="introText" class="intro-text"></div>
+    </section>
+
+    <header id="chapterHeader">
+        맥라렌의 하향세와 윌리엄스로의 이적 (1992년 ~ 1994년)
+    </header>
+
+    <main id="mainContent">
+    <div class="bg-layer">
+    </div>
+
+     <div class="tech-container" id="techContainer">
+        <img src="williams.png" alt="Williams Team" class="williams-sticker" id="techSticker">
+        <div class="tech-header">
+            <span class="year-badge">1992 TECHNOLOGY</span>
+            <h1 class="tech-title">액티브 서스펜션 (Active Suspension)</h1>
+            <p class="tech-subtitle">경기 판도를 바꾼 하이테크의 등장</p>
+        </div>
+
+        <div class="tech-body">
+            
+            <div class="video-wrapper">
+                <video class="tech-video" controls muted autoplay loop>
+                    <source src="active.mp4" type="video/mp4">
+                    브라우저가 비디오를 지원하지 않습니다.
+                </video>
+                <p class="video-caption">▲ 윌리엄스 FW14B의 움직임을 제어하는 액티브 서스펜션</p>
+            </div>
+
+            <div class="text-wrapper">
+                <p>
+                    1992년, 윌리엄스 팀은 <span class="highlight-text">액티브 서스펜션</span>이라는 혁신적인 기술을 도입해 그리드를 장악했다.
+                </p>
+                <p>
+                    컴퓨터가 노면 상태를 실시간으로 분석해 차체의 높이를 자동으로 조절하는 이 기술은 
+                    공기역학적 효율을 극대화시켜 다른 차들과 차원이 다른 속도를 만들어냈다.
+                </p>
+                <p>
+                    "다른 행성에서 온 차 같다."<br>
+                    세나는 맥라렌 머신(MP4/7)으로 사력을 다해 쫓았지만, 기술의 격차 앞에서는 역부족이었다.
+                </p>
+            </div>
+        </div>
+    </div>
+    <button class="btn-next-scene" id="toDoningtonBtn">
+        <img src="ch3_btn_next.png" alt="next">
+      </button>
+
+    <section id="doningtonSection" class="story-section">
+        <div class="story-bg" style="background-image: url('european.png');"></div>
+        <div class="story-overlay"></div> 
+        
+        <div class="story-content">
+            
+            <div class="text-side">
+                <h2 class="story-title">맥라렌-포드, 그리고 도닝턴의 기적</h2>
+                
+                <div class="story-text-box">
+                    <p>
+                        맥라렌은 뒤늦게서야 포드의 V8 엔진으로 엔진을 교체했고 액티브 서스펜션 또한 탑재할 수 있었다.
+                        시즌 5승을 할 정도로 차는 경쟁력을 되찾았으나 이미 강했던 윌리엄스-르노를 따라잡기에는 역부족이었다.
+                    </p>
+                    <p>
+                        하지만 세나는 몇몇 경기에서 인상적인 플레이를 보여줬는데 
+                        <strong>도닝턴 파크에서의 유로피언 그랑프리</strong>가 그중 하나다.
+                    </p>
+                    
+                    <p class="highlight-p clickable-quote" id="typingTarget">
+                        <span class="click-hint">▶ Click
+                    </p>
+                </div>
+
+                <button id="watchVideoBtn" class="next-btn-styled">
+                    경기 영상 보기
+                </button>
+            </div>
+
+            <div class="visual-side">
+                <div class="rotated-images">
+                    <img src="donington.png" class="img-logo" alt="Donington Logo">
+                    <img src="circuit_donington.webp" class="img-circuit" alt="Circuit Map">
+                </div>
+            </div>
+
+        </div> 
+        
+        <div class="letter-container">
+            <img src="letter.png" alt="Secret Letter" class="letter-image" id="letterImage">
+        </div>
+
+    </section>
+
+</main> 
+
+<div id="messageModal" class="message-modal">
+    <img src="letter_content.png" alt="Rainmaster Message" class="message-image">
+</div>
+
+<div id="videoModal" class="video-modal">
+    <div class="modal-content">
+        <button id="closeVideoBtn" class="close-btn">&times;</button>
+        <video id="euroVideo" controls>
+            <source src="europlay.mp4" type="video/mp4">
+        </video>
+        <p class="modal-caption">1993년 유로피언 GP, 전설적인 오프닝 랩</p>
+    </div>
+</div>
+
+   
+
+
+    <div class="nav-btns" id="navBtns">
+        <a href="chapter4.html" class="btn-back"><img src="btn_back.png" alt="Back"></a>
+
+        <a href="chapter6.html" class="btn-forward"><img src="btn_forward.png" alt="Forward"></a>
+    </div>
+
+    <section id="williamsNightmareSection" class="story-section">
+        <div class="story-bg" style="background-image: url('fw16.jpg'); filter: grayscale(90%) brightness(0.4);"></div>
+        <div class="story-overlay"></div>
+
+        <div class="story-content column-layout">
+            
+            <div class="nightmare-header">
+                <span class="year-badge red">1994 SEASON</span>
+                <h2 class="nightmare-title">꿈의 이적, 그리고 예고된 비극</h2>
+            </div>
+
+            <div class="nightmare-text-box">
+                <p>
+                    1994년, 세나는 그토록 원하던 <strong>윌리엄스-르노(Williams-Renault)</strong>로 이적했다.<br>
+                    최강의 팀과 최강의 드라이버가 만난, 완벽해 보이는 조합이었다.
+                </p>
+                <hr class="broken-line">
+                <p>
+                    하지만 FIA는 윌리엄스의 가장 강력한 무기였던<br>
+                    <span class="warning-text">'액티브 서스펜션'을 전면 금지했다.</span>
+                </p>
+                <p>
+                    핵심 기술을 잃은 <strong>FW16</strong>은 밸런스가 엉망진창으로 무너져내렸다.<br>
+                    </p>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // 변수 선언
+        const introSection = document.getElementById('introSection');
+        const introText = document.getElementById('introText');
+        const chapterHeader = document.getElementById('chapterHeader');
+        const mainContent = document.getElementById('mainContent');
+        const navBtns = document.getElementById('navBtns').querySelectorAll('a');
+
+        const message = "맥라렌의 하향세와 윌리엄스로의 이적 (1992년 ~ 1994년)";
+        const toDoningtonBtn = document.getElementById('toDoningtonBtn');
+        const techSticker = document.getElementById('techSticker');
+        const doningtonSection = document.getElementById('doningtonSection');
+        const watchVideoBtn = document.getElementById('watchVideoBtn');
+        const videoModal = document.getElementById('videoModal');
+        const closeVideoBtn = document.getElementById('closeVideoBtn');
+        const euroVideo = document.getElementById('euroVideo');
+
+        const typingTarget = document.getElementById('typingTarget');
+        const quoteText = `"레인 컨디션이었던 도닝턴 파크에서 세나는\n단 한 랩 동안 4명을 모조리 추월해 선두로 올라섰다."`;
+        let isTypingStarted = false;
+
+        // --- 편지 관련 변수 ---
+        const letterImage = document.getElementById('letterImage');
+        const messageModal = document.getElementById('messageModal');
+        const openLetterSrc = 'open.png';
+        const closedLetterSrc = letterImage.src;
+        const btnForward = document.querySelector('.btn-forward');
+        const williamsNightmareSection = document.getElementById('williamsNightmareSection');
+        
+        // ⭐ BGM 관련 변수 및 상수
+        const ch5BGM = document.getElementById("ch5BGM");
+        const BGM_NORMAL_VOLUME = 0.5;
+        const BGM_DUCK_VOLUME = 0.15;
+        const DUCK_DURATION = 800;
+        
+        /* ================================
+           II. 핵심 유틸리티 함수 (페이드 인/아웃, 볼륨 조절)
+        ================================= */
+
+        // ⭐ 1. 오디오 페이드 인 함수 (BGM 시작용)
+        function fadeInMusic(audioEl, duration, targetVolume) {
+            if (!audioEl) return;
+            const step = targetVolume / (duration / 50);
+            audioEl.volume = 0;
+            audioEl.play().catch(e => console.log("BGM autoplay failed:", e)); // Autoplay 실패 메시지 출력
+
+            let currentVolume = 0;
+            audioEl.__volumeInterval = setInterval(() => {
+                currentVolume += step;
+                if (currentVolume >= targetVolume) {
+                    currentVolume = targetVolume;
+                    clearInterval(audioEl.__volumeInterval);
+                }
+                audioEl.volume = currentVolume;
+            }, 50);
+        }
+        
+        // ⭐ 2. BGM 볼륨을 부드럽게 조절하는 함수 (adjustVolume - 덕킹/언덕킹)
+        function adjustVolume(audioEl, targetVolume, duration) {
+            if (!audioEl) return;
+            const currentVolume = audioEl.volume;
+            const diff = targetVolume - currentVolume;
+            const steps = duration / 50;
+            const step = diff / steps;
+
+            if (audioEl.__volumeInterval) clearInterval(audioEl.__volumeInterval);
+
+            audioEl.__volumeInterval = setInterval(() => {
+                let newVolume = audioEl.volume + step;
+
+                if ((step > 0 && newVolume >= targetVolume) || (step < 0 && newVolume <= targetVolume)) {
+                    newVolume = targetVolume;
+                    clearInterval(audioEl.__volumeInterval);
+                }
+                audioEl.volume = newVolume;
+            }, 50);
+        }
+        
+        // ⭐ 3. BGM 페이드 아웃 함수 (다음 챕터 이동 시 사용)
+        function fadeOutMusic(audioEl, duration, callback) {
+            if (!audioEl || audioEl.volume === 0) {
+                if (callback) callback();
+                return;
+            }
+            const stepTime = 60;
+            const steps = duration / stepTime;
+            const volumeStep = audioEl.volume / steps;
+
+            if (audioEl.__volumeInterval) clearInterval(audioEl.__volumeInterval);
+
+            audioEl.__volumeInterval = setInterval(() => {
+                let newVol = audioEl.volume - volumeStep;
+                if (newVol <= 0) {
+                    audioEl.volume = 0;
+                    audioEl.pause();
+                    clearInterval(audioEl.__volumeInterval);
+                    if (callback) callback();
+                } else {
+                    audioEl.volume = newVol;
+                }
+            }, stepTime);
+        }
+
+        // 타이핑 함수
+        function typeText(element, text, speed, callback) {
+            let i = 0;
+            element.textContent = "";
+            const timer = setInterval(() => {
+                element.textContent += text[i];
+                i++;
+                if (i >= text.length) {
+                    clearInterval(timer);
+                    if (callback) callback();
+                }
+            }, speed);
+        }
+
+        // ⭐ BGM 즉시 재생 시작
+        fadeInMusic(ch5BGM, 300, BGM_NORMAL_VOLUME);
+
+        // ▶ 실행 로직 (인트로 시작)
+        typeText(introText, message, 80, () => {
+            // 타이핑 완료 후 1초 대기
+            setTimeout(() => {
+                // 인트로 페이드 아웃
+                introSection.style.opacity = 0;
+
+                // 1초 뒤 완전히 사라지고 메인 화면 등장
+                setTimeout(() => {
+                    introSection.style.display = 'none';
+
+                    // 메인 요소들 등장
+                    chapterHeader.style.display = 'block';
+                    mainContent.style.opacity = 1;
+                    navBtns.forEach(btn => btn.style.opacity = 1);
+
+                    const techContainer = document.getElementById('techContainer');
+                    const nextBtn = document.getElementById('toDoningtonBtn');
+
+                    if(techContainer) {
+                        setTimeout(() => {
+                            techContainer.classList.add('visible');
+                            if(nextBtn) nextBtn.classList.add('visible');
+                        }, 300);
+                    }
+
+                }, 1000);
+            }, 1000);
+        });
+
+
+        // 1. [다음 이야기] 버튼 클릭 -> 윌리엄스 박스 사라짐 & 도닝턴 섹션 등장
+        if(toDoningtonBtn) {
+            toDoningtonBtn.addEventListener('click', () => {
+                // 기존 박스 퇴장
+                if(techSticker) {
+                    techSticker.style.opacity = 0;
+                    techSticker.style.transform = 'translateY(20px) rotate(-3deg)';
+                    setTimeout(() => { techSticker.style.display = 'none'; }, 1000);
+                }
+
+                // 새 섹션 등장
+                if(doningtonSection) {
+                    doningtonSection.style.display = 'flex';
+                    // 약간의 딜레이 후 클래스 추가 (CSS transition 작동 위해)
+                    setTimeout(() => {
+                        doningtonSection.classList.add('visible');
+                    }, 100);
+                }
+            });
+        }
+
+        // 2. [경기 영상 보기] 버튼 클릭 -> 모달 열기 & 재생
+        if(watchVideoBtn) {
+            watchVideoBtn.addEventListener('click', () => {
+                // ⭐ [적용] BGM 볼륨 줄이기 (덕킹) ⭐
+                adjustVolume(ch5BGM, BGM_DUCK_VOLUME, DUCK_DURATION);
+
+                videoModal.classList.add('active');
+                if(euroVideo) {
+                    euroVideo.currentTime = 0;
+                    euroVideo.play();
+                }
+            });
+        }
+
+        // 3. [닫기] 버튼 클릭 -> 모달 닫기 & 일시정지
+        if(closeVideoBtn) {
+            closeVideoBtn.addEventListener('click', () => {
+                // ⭐ [적용] BGM 볼륨 원래대로 복구 (언덕킹) ⭐
+                adjustVolume(ch5BGM, BGM_NORMAL_VOLUME, DUCK_DURATION);
+
+                videoModal.classList.remove('active');
+                if(euroVideo) {
+                    euroVideo.pause();
+                }
+            });
+        }
+
+        if (typingTarget) {
+            typingTarget.addEventListener('click', () => {
+                if (isTypingStarted) return;
+                isTypingStarted = true;
+
+                typingTarget.textContent = "";
+                typingTarget.classList.add('active');
+
+                let i = 0;
+                const typingSpeed = 50;
+
+                const timer = setInterval(() => {
+                    typingTarget.textContent += quoteText[i];
+                    i++;
+                    if (i >= quoteText.length) {
+                        clearInterval(timer);
+                    }
+                }, typingSpeed);
+            });
+        }
+
+        // --- 편지 클릭 이벤트 ---
+        if (letterImage && messageModal) {
+            letterImage.addEventListener('click', () => {
+                letterImage.style.animation = 'none';
+                letterImage.src = openLetterSrc;
+
+                setTimeout(() => {
+                    messageModal.style.display = 'flex';
+                    setTimeout(() => {
+                        messageModal.style.opacity = '1';
+                        messageModal.classList.add('show');
+                    }, 50);
+                }, 1000);
+            });
+
+            messageModal.addEventListener('click', () => {
+                messageModal.style.opacity = '0';
+                messageModal.classList.remove('show');
+
+                setTimeout(() => {
+                    messageModal.style.display = 'none';
+                    letterImage.src = closedLetterSrc;
+                    letterImage.style.animation = 'shake 2s infinite';
+                }, 500);
+            });
+        }
+
+        // Forward 버튼(우측 하단 화살표) 클릭 시 다음 장면으로 이동
+        if (btnForward) {
+            btnForward.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // 상황 1: 마지막 섹션(Williams Nightmare)이 아직 화면에 안 보일 때
+                if (williamsNightmareSection && getComputedStyle(williamsNightmareSection).display === 'none') {
+                    
+                    // ⭐ [적용] BGM 볼륨 줄이기 (nightmare 섹션 진입) ⭐
+                    adjustVolume(ch5BGM, BGM_DUCK_VOLUME, DUCK_DURATION);
+
+                    // 윌리엄스 섹션 등장
+                    williamsNightmareSection.style.display = 'flex';
+                    setTimeout(() => {
+                        williamsNightmareSection.classList.add('visible');
+                    }, 50);
+                }
+                // 상황 2: 이미 마지막 섹션이 화면에 보이고 있을 때 -> 다음 챕터(chapter6.html)로 이동
+                else {
+                    // ⭐ [적용] 다음 챕터로 이동 시 BGM을 완전히 끄고 이동 ⭐
+                    fadeOutMusic(ch5BGM, 600, () => {
+                         window.location.href = 'chapter6.html';
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

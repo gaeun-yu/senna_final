@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Chapter 4: 2연속 챔피언 달성과 전성기</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          background: #000;
+          color: #fff;
+          font-family: "Pretendard";
+          overflow: hidden; /* 한 화면 고정 */
+        }
+
+        /* 상단 헤더 (앞 챕터랑 톤 맞게) */
+        header {
+          width: 100%;
+          padding: 18px 0;
+          text-align: center;
+          background: rgba(0, 0, 0, 0.9);
+          font-size: 18px;
+          font-weight: 500;
+        }
+
+        main {
+          width: 100%;
+          height: calc(100vh - 60px); /* 헤더 제외 화면 */
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+        }
+        .nav {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            z-index: 20;
+        }
+
+        .nav img {
+            width: 120px;
+            cursor: pointer;
+        }
+        .nav-btns {
+          position: fixed;
+          bottom: 0;         /* 📌 화면 바닥에 붙임 */
+          left: 0;
+          width: 100%;       /* 화면 전체 폭 사용 */
+          display: flex;
+          justify-content: space-between; /* back = 왼쪽 / forward = 오른쪽 */
+          align-items: flex-end;
+          padding: 0 30px 20px; /* 좌우 30px, 아래 20px 여백 */
+          z-index: 99999;     /* 📌 최상단 요소 */
+          pointer-events: none; /* 기본 클릭 막기 */
+        }
+
+        /* 개별 버튼만 클릭 가능하게 */
+        .nav-btns a {
+          pointer-events: all;
+          display: block;
+        }
+
+        /* 버튼 크기 조절 */
+        .nav-btns img {
+          height: 50px;  /* 이미지 크기 조절 */
+          opacity: 0.9;
+          transition: transform .2s, opacity .2s ease;
+        }
+
+        /* hover 효과 */
+        .nav-btns img:hover {
+          transform: scale(1.08);
+          opacity: 1;
+        }
+
+        
+
+        /* ✔ 1) 인트로 화면 */
+        /* 인트로 화면 */
+        .intro-section {
+          position: fixed;
+          height: 100vh;
+          width: 100vw;
+          inset: 0;   /* 👈 top을 60px로, 헤더 아래부터 덮기 */
+          background: black;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 22px;
+          opacity: 1;
+          z-index: 9999;
+          transition: opacity 0.8s ease;
+      }
+
+        /* 전환 화면 */
+        .main-section {
+          position: relative;
+          width: 100%;
+          height: calc(100vh - 60px);
+          background-image: url("ch4_bg.png"); /* 👉 너의 파일명으로 수정 */
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          transition: opacity 0.8s ease;
+          opacity: 0;
+          z-index: 10;
+        }
+        .initial-bg-section {
+          position: absolute;
+          width: 100%;
+          height: calc(100vh - 60px);
+          background-image: url("ch3_rivary.png"); /* 👉 첫 번째 이미지 파일명 사용 */
+          background-size: cover;
+          background-position: center;
+          opacity: 0; /* 초기에는 숨김 */
+          transition: opacity 0.8s ease;
+          z-index: 5; /* chapter4Main (z-index: 1) 아래에 배치 */
+        }
+
+        .chapter4-bg {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .ch4-info-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 280px; /* 이미지 박스와 텍스트 박스 간격 */
+            
+            background: rgba(0, 0, 0, 0.7); /* 배경에 살짝 투명도 추가 */
+            
+            /* 초기 숨김 및 애니메이션 */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            z-index: 15; /* chapter4Main 위에 확실히 오버랩 */
+        }
+
+        /* ▼ 이미지 박스 스타일 ▼ */
+        .ch4-image-box {
+            position: relative;
+            width: 350px;
+            height: 350px;
+        }
+        .ch4-image-box img {
+            position: absolute;
+            width: 120%;
+            top: -50%;
+            height: auto;
+            left: -30%;
+            transform: rotate(-10deg);
+        }
+
+        .ch4-image-box .overlay-img {
+            width: 150%;
+            top: 30%;
+            left: 15%;
+            bottom: 20%;
+            transform: rotate(10deg);
+            transition: transform 0.5s ease;
+        }
+
+        .ch4-image-box .effect-img {
+            width: 90%;
+            top: -32%;
+            left: 65%;
+            bottom: 20%;
+            transform: rotate(10deg);
+            transition: transform 0.5s ease;
+        }
+
+        
+
+
+        /* ▼ 텍스트 박스 스타일 ▼ */
+        .ch4-text-box {
+            width: 600px;
+            padding: 30px;
+            background: black;
+        }
+        .ch4-title {
+            display: block;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .ch4-content-wrapper {
+            display: flex;
+            flex-direction: column; /* 세로로 배치 */
+            align-items: center;    /* 중앙 정렬 */
+            width: 400px;           /* 텍스트 박스 폭에 맞춤 */
+        }
+
+        /* ▼ [5] 텍스트 박스 스타일 수정 (margin-bottom 추가) ▼ */
+        .ch4-text-box {
+            width: 120%; /* 래퍼 폭에 맞춤 */
+            padding: 30px;
+            background: black;
+            margin-bottom: 60px; /* 로고 영역과의 간격 */
+
+            
+            /* 텍스트 박스 내 flex 제거 (원래 텍스트 흐름으로 복원) */
+            display: block; 
+        }
+
+        .ch4-text-box p {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+       
+
+        /* ▼ [4] 캡션 영역 스타일 수정 (로고와 겹치지 않도록 position 제거) ▼ */
+        .ch4-bottom-caption {
+            font-size: 20px;
+            color: #EA4741;
+            cursor: pointer;
+            /* 절대 위치가 있었다면 제거 */
+            margin-top: 4px; 
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center; /* 캡션 중앙 정렬 */
+        }
+
+        /* chapter4.html - <style> 섹션 내부에 추가 */
+
+        /* ▼ [2] 상세 해설 오버레이 스타일 ▼ */
+        .details-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95); /* 거의 불투명한 배경 */
+            display: none; /* 초기 숨김 */
+            align-items: center;
+            justify-content: center;
+            z-index: 9998;
+        }
+
+        .details-overlay.visible {
+            display: flex; /* 보일 때 flex로 변경 */
+        }
+
+        .details-inner {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            background: #F0EEE4; /* 어두운 내부 배경 */
+            color: #000;
+            padding-top: 40px;
+            padding-left: 40px;
+            padding-right: 40px;
+            line-height: 1.6;
+        }
+
+        .details-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        .details-content strong {
+            color: #black;
+            display: block;
+            margin-bottom: 5px;
+            margin-top: 5px;
+        }
+
+        .details-note {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .details-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #777;
+            font-size: 52px;
+            cursor: pointer;
+        }
+        /* chapter4.html - <style> 섹션 내부에 추가 */
+
+        /* ▼ [2] 상세 오버레이 내 비디오 스타일 ▼ */
+        .details-video-area {
+            margin-top: 30px;
+            padding-top: 15px;
+            text-align: center;
+        }
+
+
+
+        #sennaQuoteVideo {
+            width: 100%;
+            max-width: 450px; /* 비디오 최대 폭 설정 */
+            height: auto;
+            display: block;
+            margin: 0 auto; /* 중앙 정렬 */
+            margin-bottom: 20px;
+        }
+
+        .video-context {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #777;
+            margin-bottom: 30px;
+        }
+        /* chapter4.html - <style> 섹션 내부에 추가 */
+
+        /* ▼ [2] '다음 이야기' 버튼 스타일 ▼ */
+        .next-story-btn {
+            background: #EA4741; /* 주황색 계열로 강조 */
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            
+            /* 래퍼 내에서 로고 아래에 위치하도록 마진 설정 */
+            margin-top: 30px; 
+        }
+
+        .next-story-btn:hover {
+            background: #E63900;
+        }
+
+        /* chapter4.html - <style> 맨 아래에 추가 */
+
+        /* ▼ [새로 추가] 3번째 챔피언 오버레이 스타일 ▼ */
+        .champion-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85); /* 배경 어둡게 */
+            z-index: 9998; /* 기존 오버레이보다 위에 */
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            opacity: 0;           /* 초기엔 안 보임 */
+            pointer-events: none; /* 클릭 불가 */
+            transition: opacity 0.8s ease;
+        }
+
+        .champion-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* 종이 배경 래퍼 */
+        .paper-wrapper {
+            position: relative;
+            width: 900px;  /* 종이 크기 조절 */
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 종이 배경 이미지 */
+        .paper-bg-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* 종이 이미지를 꽉 채움 */
+            z-index: 1;
+        }
+
+        /* 종이 위 콘텐츠 레이아웃 */
+        .paper-content {
+            position: relative;
+            z-index: 2;
+            width: 85%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* 상단 사진과 하단 박스 사이 간격 */
+            padding: 10px;
+        }
+
+        /* 상단 영역 (사진 + 손글씨) */
+        .champ-top-area {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+        }
+
+        .photo-frame {
+            flex: 0 0 auto;
+            width: 460px;
+        }
+        .photo-frame img {
+            width: 100%;
+            display: block;
+        }
+
+        .handwritten-text {
+            flex: 1;
+            padding-top: 20px;
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        /* 화살표 스타일 */
+        .drawn-arrow {
+            width: 100px;        
+            height: auto;
+            display: block;
+            margin-top: 10px;    
+            margin-left: 20px;  
+            }
+        
+
+        /* 하단 검은색 박스 */
+        .champ-black-box {
+            color: #121212;
+            padding: 25px 30px;
+            width: 90%;
+            margin: 0 auto; /* 가운데 정렬 */
+        }
+
+        .champ-black-box h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .champ-black-box p {
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: 600;
+            color: #222;
+        }
+
+        
+        
+    </style>
+    <body>
+        <section id="introSection" class="intro-section">
+            <div id="introText"></div>
+          </section>
+        <header>
+            2연속 챔피언 달성과 전성기 (1990년 ~ 1991년)
+          </header>
+          <main>
+        <audio id="crashSound" src="crash.mp3" preload="auto"></audio>
+        <audio id="ch4Bgm" src="ch4_bgm.mp3"></audio>
+        <audio id="racingSound" src="racing.mp3" preload="auto"></audio>
+
+        <section id="initialBg" class="initial-bg-section">
+         </section>
+         
+          <section id="chapter4Main" class="main-section">
+          </section>
+
+          <div class="nav-btns">
+          <a href="chapter3.html" class="btn-back">
+            <img src="btn_back.png" alt="back">
+          </a>
+          <a href="chapter5.html" class="btn-forwards">
+            <img src="btn_forward.png" alt="forward">
+          </a>
+        </div>
+
+        <div id="ch4InfoOverlay" class="ch4-info-overlay">
+        
+        <div class="ch4-image-box left">
+            <img src="ch4_crash1.png" alt="1990 스즈카 충돌 사진" class="ch4-image">
+            <img src="ch4_crash2.png" alt="1990 스즈카 잔해 사진" class="ch4-image overlay-img">
+            <img src="ch4_crash.png" alt="crash" class="ch4-image effect-img">
+
+        </div>
+
+        <div class="ch4-content-wrapper right"> 
+        
+        <div class="ch4-text-box">
+            <span class="ch4-title">복수극 (1990년)</span>
+            <p>
+                페라리로 이적한 프로스트와 세나는 스즈카에서 다시 충돌했고,<br>
+                이번에는 프로스트가 실격당하며 세나가 두 번째 월드 챔피언 타이틀을 차지했다.
+            </p>
+            <div class="ch4-bottom-caption">
+                사건의 내막이 궁금하다면?
+            </div>
+        </div>
+
+        
+
+        <button id="nextStoryBtn" class="next-story-btn">
+            다음 이야기 ▶
+        </button>
+
+    </div></div>
+
+   <div id="detailsOverlay" class="details-overlay">
+    <div class="details-inner">
+        
+        <button class="details-close-btn">&times;</button>
+        
+        <h2 class="details-title">1990년 스즈카 충돌 사건의 내막</h2>
+        
+        <div class="details-content">
+            <p><strong>사건 발생 원인</strong></p>
+            <p>스즈카에서 폴 포지션이 불리한 오른쪽으로 변경되자 세나는 FIA가 자신을 정치적으로 불리하게 만든다고 강하게 반발했다.</p>
+            
+            <p><strong>챔피언 확정 사고</strong></p>
+            <p>폴 포지션을 차지한 세나는 경기 당일 스타트 직후 프로스트가 앞서자, 1번 코너에서 감속 없이 들이받아 둘 다 리타이어했고 그 자리에서 세나의 챔피언이 확정됐다. (프로스트가 좋은 성적을 거두지 못하면 경기 결과에 상관없이 세나의 챔피언이 확정되는 상황)</p>
+            
+            <p class="details-note">
+                이 사고는 거센 논란을 낳았고, 세나는 1년 후 고의성을 사실상 인정하는 발언을 남기며 후일담이 이어졌다.
+            </p>
+        </div>
+
+        <div class="details-video-area">
+            <video id="sennaQuoteVideo" src="Ayrton Senna Quote.mp4" controls></video>
+            <p class="video-context">
+                "If you no longer go for a gap that exist, you no longer race driver." (Ayrton Senna, 1989)"<br>
+
+                해당 인터뷰는 경기 후 세나의 가치관을 드러내는 문장으로, 레이싱 드라이버는
+             위험을 감수하고 간격의 틈이 있을 때 기회를 잡으려는 의지가 있어야 함을 의미한다.
+            </p>
+        </div>
+        
+    </div>
+    </div>
+
+        <div id="thirdChampionSection" class="champion-overlay">
+        <div class="paper-wrapper">
+            <img src="memo.jpg" alt="종이 배경" class="paper-bg-img">
+            
+            <div class="paper-content">
+                
+                <div class="champ-top-area">
+                    <div class="photo-frame">
+                        <img src="senna_brazil_won.png" alt="브라질 우승 세나">
+                    </div>
+                    
+                    <div class="handwritten-text">
+                        <p>또한 1991 시즌에서 세나는<br>오랜 꿈과 같은 일을 해내게 된다<br>바로 조국 브라질 그랑프리에서의 우승</p>
+                        <img src="arrow.png" alt="화살표" class="drawn-arrow">
+                    </div>
+                </div>
+
+                <div class="champ-black-box">
+                    <h3>3번째 챔피언</h3>
+                    <p>
+                        1991년, 압도적인 기량으로 시즌을 이끌며 세 번째 월드 챔피언에 등극했고 
+                        이로써 세나는 3회 월드 챔피언의 반열에 오르며 명실상부 당대 최고의 선수로 인정받았다.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+              
+
+        <script>
+        // -----------------------------------------------------------------
+        // I. 변수 선언 (중복 제거 및 요소 참조 통합)
+        // -----------------------------------------------------------------
+        const introText = document.getElementById("introText");
+        const introSection = document.getElementById("introSection");
+        const chapter4Main = document.getElementById("chapter4Main");
+        const silhouetteSection = document.getElementById("silhouetteSection");
+
+        const introMessage = "2연속 챔피언 달성과 전성기 (1990년 ~ 1991년)";
+        const initialBg = document.getElementById("initialBg");
+            
+        // ⭐ [통합 및 수정] 상세 오버레이 관련 변수
+        const ch4BottomCaption = document.querySelector(".ch4-bottom-caption"); 
+        const detailsOverlay = document.getElementById("detailsOverlay"); 
+        const detailsCloseBtn = document.querySelector(".details-close-btn"); 
+
+        const sennaQuoteVideo = document.getElementById("sennaQuoteVideo");
+        // chapter4.html - <script> 섹션 내부 (I. 변수 선언)
+
+        // ... (기존 변수들)
+
+        // ⭐ [추가] 효과음 오디오 요소 참조
+        const crashSound = document.getElementById("crashSound");
+
+        // [통합 및 수정] ch4InfoOverlay는 한 번만 선언
+        const ch4InfoOverlay = document.getElementById("ch4InfoOverlay");
+        // ... (나머지 변수들)
+        const thirdChampionSection = document.getElementById("thirdChampionSection");
+        const ch4Bgm = document.getElementById("ch4Bgm");
+        const racingSound = document.getElementById("racingSound");
+
+
+        /* ✏️ 타이핑 함수 */
+        function typeText(element, text, speed, callback) {
+          let i = 0;
+          let timer = setInterval(() => {
+            element.textContent += text[i];
+            i++;
+            if (i >= text.length) {
+              clearInterval(timer);
+              if (callback) callback();
+            }
+          }, speed);
+        }
+        if (ch4Bgm) {
+            ch4Bgm.volume = 0.5; // 볼륨 조절 (0.0 ~ 1.0)
+            ch4Bgm.play().catch(error => {
+                console.log("브라우저 정책으로 인해 자동 재생이 차단되었습니다. 사용자 인터랙션이 필요합니다.");
+            });
+        }
+
+        /* ▶ 실행 흐름 시작 */
+        typeText(introText, introMessage, 80, () => {
+          
+          // 1초 후 intro 화면 페이드아웃 시작
+          setTimeout(() => {
+            introSection.style.opacity = 0;
+
+            // 인트로 페이드아웃 완료 후 (0.8초 후 실행)
+            setTimeout(() => {
+              introSection.style.display = "none";
+              
+              // 1. 첫 번째 이미지 (initialBg) 등장
+              if (initialBg) initialBg.style.opacity = 1; 
+              
+              // 2. 1.2초 후, 두 번째 화면 (chapter4Main)이 첫 번째 이미지 위에 오버랩됨
+              setTimeout(() => {
+                // 두 번째 화면 (#chapter4Main) 등장 (덮어쓰기)
+                chapter4Main.style.opacity = 1;
+
+                // ▼ [추가] 정보 오버레이 등장 (chapter4Main 등장 후 0.9초 뒤) ▼
+                setTimeout(() => {
+                  if (ch4InfoOverlay) {
+                    // ⭐ [추가] 효과음 재생 로직 ⭐
+                    if (crashSound) {
+                        // 볼륨을 적절히 설정 (0.0 ~ 1.0)
+                        crashSound.volume = 0.8; 
+                        // 오디오를 처음부터 다시 재생하도록 설정
+                        crashSound.currentTime = 0; 
+                        crashSound.play().catch(e => console.log("Audio play blocked."));
+                    }
+                    
+                    ch4InfoOverlay.style.opacity = 1;
+                    ch4InfoOverlay.style.transform = "translateY(0)"; 
+                  }
+                }, 1500); // 0.9초 딜레이 후 정보 오버레이 등장
+
+                // 3. 실루엣 화면 등장 (chapter4Main 등장 후 1.2초 뒤)
+                setTimeout(() => {
+                  if (silhouetteSection) {
+                    silhouetteSection.style.display = "flex";
+                    setTimeout(() => (silhouetteSection.style.opacity = 1), 50);
+                  }
+                }, 1200);
+
+              }, 1000); // 첫 번째 이미지 노출 후 1초 딜레이 (오버랩 타이밍)
+
+            }, 800); // introSection CSS transition 시간과 일치
+
+          }, 1000); // introMessage 타이핑 완료 후 1초 딜레이
+        });
+          
+        // -----------------------------------------------------------------
+        // II. 이벤트 리스너 (상세 해설 오버레이)
+        // -----------------------------------------------------------------
+
+        // '사건의 내막이 궁금하다면?' 캡션 클릭 이벤트 (detailsOverlay 열기)
+        if (ch4BottomCaption && detailsOverlay) {
+            ch4BottomCaption.addEventListener("click", () => {
+                detailsOverlay.classList.add("visible");
+                detailsOverlay.style.display = "flex";
+                
+                // ▼ [3] 비디오 재생 시작 ▼
+                if (sennaQuoteVideo) {
+                     // 비디오를 처음으로 돌리고 재생
+                     sennaQuoteVideo.currentTime = 0;
+                     sennaQuoteVideo.play().catch(e => console.log("Video auto-play failed."));
+                }
+            });
+        }
+
+        // 상세 오버레이 닫기 버튼 이벤트 (비디오 정지)
+        if (detailsCloseBtn && detailsOverlay) {
+            detailsCloseBtn.addEventListener("click", () => {
+                detailsOverlay.classList.remove("visible");
+                detailsOverlay.style.display = "none";
+                
+                // ▼ [4] 비디오 정지 및 초기화 ▼
+                if (sennaQuoteVideo) {
+                    sennaQuoteVideo.pause();
+                    sennaQuoteVideo.currentTime = 0;
+                }
+            });
+    }
+
+    if (nextStoryBtn) {
+        nextStoryBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation(); // 이벤트 전파 방지
+
+            console.log("다음 이야기 버튼 클릭됨");
+
+            // (1) 현재 보고 있는 복수극 오버레이(ch4InfoOverlay) 숨기기
+            if (ch4InfoOverlay) {
+                ch4InfoOverlay.style.opacity = 0;
+                // 페이드 아웃 시간(0.8s) 후 display none 처리
+                setTimeout(() => {
+                    ch4InfoOverlay.style.display = 'none';
+                }, 800);
+            }
+
+            // (2) 새로 만든 '3번째 챔피언' 오버레이 띄우기
+            if (thirdChampionSection) {
+                // display: flex 속성은 CSS(.champion-overlay)에 이미 적용되어 있음 (기본 display: flex)
+                // opacity만 조절하여 등장 효과
+                setTimeout(() => {
+
+                    if (racingSound) {
+                        racingSound.volume = 0.8; // 볼륨 설정
+                        racingSound.currentTime = 0;
+                        racingSound.play().catch(e => console.log("Audio play blocked."));
+                    }
+                    thirdChampionSection.classList.add("visible");
+                }, 100); // 아주 짧은 딜레이 후 등장
+            }
+        });
+    }
+    </script>
+    </main>
+    </body>
+    </head>
